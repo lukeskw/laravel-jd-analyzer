@@ -18,4 +18,3 @@ interface LLMClientInterface
      */
     public function analyze(string $jobText, string $resumeText): array;
 }
-

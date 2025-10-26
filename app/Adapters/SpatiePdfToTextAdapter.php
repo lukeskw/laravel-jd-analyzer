@@ -16,10 +16,11 @@ class SpatiePdfToTextAdapter implements PdfParserInterface
             }
 
             $text = Pdf::getText($path);
+
             return trim($text ?? '');
         } catch (\Throwable $e) {
-            Log::error("PDF text extraction failed for {$path}: " . $e->getMessage());
-            throw new \RuntimeException("Failed to extract text from PDF: " . $e->getMessage());
+            Log::error("PDF text extraction failed for {$path}: ".$e->getMessage());
+            throw new \RuntimeException('Failed to extract text from PDF: '.$e->getMessage());
         }
     }
 }

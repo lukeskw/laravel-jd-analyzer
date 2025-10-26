@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use App\Contracts\PdfParserInterface;
+use App\Adapters\FakeLLMClient;
+use App\Adapters\PrismLLMClient;
 use App\Adapters\SpatiePdfToTextAdapter;
 use App\Contracts\LLMClientInterface;
-use App\Adapters\PrismLLMClient;
-use App\Adapters\FakeLLMClient;
+use App\Contracts\PdfParserInterface;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,8 +22,8 @@ class AppServiceProvider extends ServiceProvider
             $driver = (string) config('llm.driver', 'fake');
 
             return match ($driver) {
-                'prism' => new PrismLLMClient(),
-                default => new FakeLLMClient(),
+                'prism' => new PrismLLMClient,
+                default => new FakeLLMClient,
             };
         });
     }

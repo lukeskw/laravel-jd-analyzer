@@ -12,7 +12,6 @@ class FakeLLMClient implements LLMClientInterface
         $resumeTokens = $this->tokens($resumeText);
 
         $jdUnique = array_values(array_unique(array_filter($jdTokens, fn ($t) => strlen($t) >= 4)));
-        // Focus on top 20 JD tokens for a quick heuristic
         $jdSlice = array_slice($jdUnique, 0, 20);
 
         $present = [];
@@ -46,7 +45,7 @@ class FakeLLMClient implements LLMClientInterface
         $text = strtolower($text);
         $text = preg_replace('/[^a-z0-9]+/i', ' ', $text) ?? '';
         $parts = preg_split('/\s+/', $text) ?: [];
+
         return array_values(array_filter($parts));
     }
 }
-

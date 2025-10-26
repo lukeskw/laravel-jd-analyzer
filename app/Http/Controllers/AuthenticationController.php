@@ -48,6 +48,7 @@ class AuthenticationController extends Controller
             $user = User::where('email', (string) $email)->first();
             if ($user && Hash::check((string) $password, (string) $user->password)) {
                 $plainTextToken = $user->createToken('api-refresh-'.now()->format('YmdHis'))->plainTextToken;
+
                 return response()->json($this->tokenResponse($plainTextToken));
             }
         }

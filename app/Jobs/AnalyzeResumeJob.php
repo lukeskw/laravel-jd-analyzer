@@ -17,10 +17,9 @@ use Throwable;
 
 class AnalyzeResumeJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public string $candidateId)
-    {}
+    public function __construct(public string $candidateId) {}
 
     /**
      * Calculate the number of seconds to wait before retrying the job.
@@ -46,7 +45,7 @@ class AnalyzeResumeJob implements ShouldQueue
             $resumeText = $pdf->parse($resumePath);
         } catch (\Throwable $e) {
             $resumeText = '';
-            //improve this logic later on
+            // improve this logic later on
         }
 
         $analysis = $fit->evaluate($jdText, $resumeText);
@@ -72,5 +71,4 @@ class AnalyzeResumeJob implements ShouldQueue
 
         Log::error('Resume analysis failed', $context);
     }
-
 }

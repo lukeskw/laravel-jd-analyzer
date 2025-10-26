@@ -6,20 +6,19 @@ use App\Http\Requests\ListCandidatesRequest;
 use App\Http\Requests\StoreJobDescriptionRequest;
 use App\Http\Requests\StoreResumesRequest;
 use App\Jobs\AnalyzeResumeJob;
-use App\Services\PdfParserService;
-use App\Models\JobDescription;
 use App\Models\Candidate;
-use Illuminate\Http\JsonResponse;
+use App\Models\JobDescription;
+use App\Services\PdfParserService;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Storage;
 
 class CandidateFitController extends Controller
 {
     public function __construct(
         private PdfParserService $pdfParser,
-    ) {
-    }
+    ) {}
 
     public function storeJobDescription(StoreJobDescriptionRequest $request): JsonResponse
     {
@@ -95,6 +94,7 @@ class CandidateFitController extends Controller
                 if (! $candidate) {
                     return response()->json(['message' => 'Candidate not found'], 404);
                 }
+
                 return response()->json($candidate);
             }
 

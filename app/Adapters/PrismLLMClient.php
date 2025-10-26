@@ -18,9 +18,9 @@ class PrismLLMClient implements LLMClientInterface
         $jobText = $this->truncate($jobText);
         $resumeText = $this->truncate($resumeText);
 
-        $system = "You compare a job description with a resume and output only strict JSON.\n" .
-            "Return keys: fit_score (0-100 integer), strengths (array of strings), weaknesses (array of strings), summary (string), evidence (array of short strings).\n" .
-            "Do not include commentary or markdown fences.";
+        $system = "You compare a job description with a resume and output only strict JSON.\n".
+            "Return keys: fit_score (0-100 integer), strengths (array of strings), weaknesses (array of strings), summary (string), evidence (array of short strings).\n".
+            'Do not include commentary or markdown fences.';
 
         $user = "JOB DESCRIPTION:\n{$jobText}\n---\nRESUME:\n{$resumeText}";
 
@@ -66,36 +66,38 @@ class PrismLLMClient implements LLMClientInterface
                 ->asStructured();
 
             $data = (array) ($response->structured ?? []);
+
             return $this->normalize($data);
         } catch (\Throwable $e) {
-            Log::error('LLM analysis failed: ' . $e->getMessage());
+            Log::error('LLM analysis failed: '.$e->getMessage());
+
             return $this->fallback($jobText, $resumeText);
         }
     }
-
-    // Provider resolution not needed; locked to Gemini
 
     private function truncate(string $text, int $max = 12000): string
     {
         if (mb_strlen($text) <= $max) {
             return $text;
         }
+
         return mb_substr($text, 0, $max);
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
     private function normalize(array $data): array
     {
         $result = [
-            'fit_score' => max(0, min(100, (int)($data['fit_score'] ?? 0))),
+            'fit_score' => max(0, min(100, (int) ($data['fit_score'] ?? 0))),
             'strengths' => array_values(array_map('strval', $data['strengths'] ?? [])),
             'weaknesses' => array_values(array_map('strval', $data['weaknesses'] ?? [])),
-            'summary' => (string)($data['summary'] ?? ''),
+            'summary' => (string) ($data['summary'] ?? ''),
             'evidence' => array_values(array_map('strval', $data['evidence'] ?? [])),
         ];
+
         return $result;
     }
 
@@ -106,6 +108,7 @@ class PrismLLMClient implements LLMClientInterface
         $slice = array_slice(array_values(array_unique(array_filter($jt, fn ($t) => strlen($t) >= 4))), 0, 20);
         $present = array_values(array_intersect($slice, $rt));
         $score = (int) round((count($present) / max(count($slice), 1)) * 100);
+
         return [
             'fit_score' => max(0, min(100, $score)),
             'strengths' => array_map(fn ($t) => ucfirst($t), array_slice($present, 0, 5)),
@@ -123,6 +126,7 @@ class PrismLLMClient implements LLMClientInterface
         $text = strtolower($text);
         $text = preg_replace('/[^a-z0-9]+/i', ' ', $text) ?? '';
         $parts = preg_split('/\s+/', $text) ?: [];
+
         return array_values(array_filter($parts));
     }
 }

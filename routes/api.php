@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CandidateFitController;
 use App\Http\Controllers\AuthenticationController;
+use App\Http\Controllers\CandidateFitController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')
     ->as('api.v1.')

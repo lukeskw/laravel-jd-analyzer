@@ -6,4 +6,3 @@ interface PdfParserInterface
 {
     public function extractText(string $path): string;
 }
-
