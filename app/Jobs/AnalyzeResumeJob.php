@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Models\Candidate;
+use App\Services\CandidateFitService;
+use App\Services\PdfParserService;
+use Illuminate\Bus\Batchable;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Throwable;
+
+class AnalyzeResumeJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
+
+    public function __construct(public string $candidateId)
+    {}
+
+    /**
+     * Calculate the number of seconds to wait before retrying the job.
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [1, 5, 10];
+    }
+
+    public function handle(PdfParserService $pdf, CandidateFitService $fit): void
+    {
+        $candidate = Candidate::query()->with('jobDescription')->find($this->candidateId);
+        if (! $candidate || ! $candidate->jobDescription) {
+            return;
+        }
+
+        $jdText = (string) $candidate->jobDescription->text;
+
+        $resumePath = Storage::disk('local')->path($candidate->stored_path);
+        try {
+            $resumeText = $pdf->parse($resumePath);
+        } catch (\Throwable $e) {
+            $resumeText = '';
+            //improve this logic later on
+        }
+
+        $analysis = $fit->evaluate($jdText, $resumeText);
+
+        $candidate->fill([
+            'resume_text' => $resumeText,
+            'fit_score' => $analysis['fit_score'] ?? 0,
+            'strengths' => $analysis['strengths'] ?? [],
+            'weaknesses' => $analysis['weaknesses'] ?? [],
+            'summary' => $analysis['summary'] ?? '',
+            'evidence' => $analysis['evidence'] ?? [],
+        ])->save();
+    }
+
+    public function failed(Throwable $exception): void
+    {
+        $context = [
+            'job' => 'AnalyzeResumeJob',
+            'candidate_id' => $this->candidateId,
+            'error' => $exception->getMessage(),
+            'exception' => get_class($exception),
+        ];
+
+        Log::error('Resume analysis failed', $context);
+    }
+
+}
