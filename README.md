@@ -193,6 +193,7 @@ Optional detail: `curl "http://localhost:8000/api/v1/jds/<jd_id>/candidates?cand
 - Use AWS S3 and AWS ECS/Fargate to store and deploy the app.
 - Improve exception handling and standardize message returns by using trans() function and custom messages on bootstrap/app.php ->withExceptions() method.
 - Creating an observability middleware to deal with Logs/Tracing and Metrics using Open Telemetry
+- Install PHPStan to ensure type safety. I didn’t go deeper since setting up complex type assertions would be overkill for this short time frame.
 
 ## Deployment
 - For local demo, `sail up -d` from this repo is sufficient.
