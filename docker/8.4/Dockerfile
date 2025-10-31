@@ -71,7 +71,7 @@ RUN cp /tmp/sail/start-container /usr/local/bin/start-container \
     && cp /tmp/sail/php.ini /etc/php/8.4/cli/conf.d/99-sail.ini \
     && chmod +x /usr/local/bin/start-container
 
-COPY composer.json composer.lock ./
+COPY composer.json composer.lock artisan ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
 COPY . .
