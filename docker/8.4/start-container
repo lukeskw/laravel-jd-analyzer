@@ -9,10 +9,6 @@ if [ -n "${PORT}" ]; then
     export SUPERVISOR_PHP_COMMAND="/usr/bin/php8.4 -d variables_order=EGPCS /var/www/html/artisan serve --host=0.0.0.0 --port=${PORT}"
 fi
 
-if [ -f /var/www/html/artisan ]; then
-    php /var/www/html/artisan migrate --force --no-interaction || echo "Database migration failed (continuing)"
-fi
-
 if [ ! -z "$WWWUSER" ]; then
     usermod -u $WWWUSER sail
 fi
@@ -32,6 +28,18 @@ mkdir -p /var/www/html/bootstrap/cache \
 
 chown -R "${SUPERVISOR_PHP_USER}:${WWWGROUP}" /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R ug+rwX /var/www/html/storage /var/www/html/bootstrap/cache
+
+if [ -f /var/www/html/artisan ]; then
+    if [ -z "${APP_KEY}" ]; then
+        GENERATED_KEY=$(php /var/www/html/artisan key:generate --show 2>/dev/null || true)
+
+        if [ -n "${GENERATED_KEY}" ]; then
+            export APP_KEY="${GENERATED_KEY}"
+        fi
+    fi
+
+    php /var/www/html/artisan migrate --force --no-interaction >/dev/null 2>&1 || echo "Database migration failed (continuing)"
+fi
 
 if [ $# -gt 0 ]; then
     if [ "$SUPERVISOR_PHP_USER" = "root" ]; then
