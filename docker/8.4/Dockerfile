@@ -73,6 +73,16 @@ COPY composer.json composer.lock artisan ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
 COPY . .
+RUN set -eux; \
+    mkdir -p bootstrap/cache \
+             storage/framework/cache \
+             storage/framework/data \
+             storage/framework/sessions \
+             storage/framework/testing \
+             storage/framework/views \
+             storage/logs; \
+    chown -R sail:sail storage bootstrap/cache; \
+    chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8000
 

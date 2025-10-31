@@ -18,6 +18,16 @@ if [ ! -d /.composer ]; then
 fi
 
 chmod -R ugo+rw /.composer
+mkdir -p /var/www/html/bootstrap/cache \
+         /var/www/html/storage/framework/cache \
+         /var/www/html/storage/framework/data \
+         /var/www/html/storage/framework/sessions \
+         /var/www/html/storage/framework/testing \
+         /var/www/html/storage/framework/views \
+         /var/www/html/storage/logs
+
+chown -R "${SUPERVISOR_PHP_USER}:${WWWGROUP}" /var/www/html/storage /var/www/html/bootstrap/cache
+chmod -R ug+rwX /var/www/html/storage /var/www/html/bootstrap/cache
 
 if [ $# -gt 0 ]; then
     if [ "$SUPERVISOR_PHP_USER" = "root" ]; then
