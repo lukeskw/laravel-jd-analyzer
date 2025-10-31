@@ -72,7 +72,7 @@ RUN cp /tmp/sail/start-container /usr/local/bin/start-container \
     && chmod +x /usr/local/bin/start-container
 
 COPY composer.json composer.lock artisan ./
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
 COPY . .
 
