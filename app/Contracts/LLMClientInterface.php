@@ -13,6 +13,8 @@ interface LLMClientInterface
      * - weaknesses string[]
      * - summary string
      * - evidence string[] (optional)
+     * - candidate_name string
+     * - candidate_email string
      *
      * @return array<string, mixed>
      */

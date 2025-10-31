@@ -41,14 +41,22 @@ class AnalyzeResumeJob implements ShouldQueue
         $jdText = (string) $candidate->jobDescription->text;
 
         $resumePath = Storage::disk('local')->path($candidate->stored_path);
+        $analysis = null;
+        $resumeText = '';
         try {
             $resumeText = $pdf->parse($resumePath);
         } catch (\Throwable $e) {
             $resumeText = '';
-            // improve this logic later on
+            Log::error('Failed to parse resume PDF', [
+                'candidate_id' => $this->candidateId,
+                'error' => $e->getMessage(),
+            ]);
+            $analysis = $fit->errorResult();
         }
 
-        $analysis = $fit->evaluate($jdText, $resumeText);
+        if ($analysis === null) {
+            $analysis = $fit->evaluate($jdText, $resumeText);
+        }
 
         $candidate->fill([
             'resume_text' => $resumeText,
@@ -57,6 +65,8 @@ class AnalyzeResumeJob implements ShouldQueue
             'weaknesses' => $analysis['weaknesses'] ?? [],
             'summary' => $analysis['summary'] ?? '',
             'evidence' => $analysis['evidence'] ?? [],
+            'candidate_name' => $analysis['candidate_name'] ?? '',
+            'candidate_email' => $analysis['candidate_email'] ?? '',
         ])->save();
     }
 

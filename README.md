@@ -53,6 +53,11 @@ The API is served on `http://localhost:8000` (from `.env` APP_PORT). Redis and P
 
 
 ## API Reference
+- GET `/jds`
+  - Returns all job descriptions sorted by newest first with the number of associated candidates.
+  - Each item: `{ jd_id, title, candidate_count }`
+  - Code: `app/Http/Controllers/CandidateFitController.php`
+
 - POST `/jds`
   - multipart/form-data with:
     - `title` string (unique per JD)

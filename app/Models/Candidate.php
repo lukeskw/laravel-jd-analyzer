@@ -25,6 +25,8 @@ class Candidate extends Model
         'weaknesses',
         'summary',
         'evidence',
+        'candidate_name',
+        'candidate_email',
     ];
 
     protected $casts = [
@@ -32,6 +34,8 @@ class Candidate extends Model
         'strengths' => 'array',
         'weaknesses' => 'array',
         'evidence' => 'array',
+        'candidate_name' => 'string',
+        'candidate_email' => 'string',
     ];
 
     protected $hidden = ['stored_path', 'resume_text'];

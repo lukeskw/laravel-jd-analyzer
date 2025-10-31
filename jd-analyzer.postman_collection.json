@@ -8,7 +8,43 @@
 	"item": [
 		{
 			"name": "candidate-fit",
-			"item": []
+			"item": [
+				{
+					"name": "list-jds",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/jds",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"jds"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		},
 		{
 			"name": "auth",

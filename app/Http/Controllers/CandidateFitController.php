@@ -8,11 +8,13 @@ use App\Http\Requests\StoreResumesRequest;
 use App\Jobs\AnalyzeResumeJob;
 use App\Models\Candidate;
 use App\Models\JobDescription;
+use App\Http\Resources\JobDescriptionResource;
 use App\Services\PdfParserService;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class CandidateFitController extends Controller
 {
@@ -45,6 +47,16 @@ class CandidateFitController extends Controller
         ]);
 
         return response()->json(['jd_id' => $jd->id, 'title' => $jd->title]);
+    }
+
+    public function listJobDescriptions(): JsonResource
+    {
+        $descriptions = JobDescription::query()
+            ->withCount('candidates')
+            ->orderByDesc('created_at')
+            ->get(['id', 'title', 'created_at']);
+
+        return JobDescriptionResource::collection($descriptions);
     }
 
     public function storeResumes(StoreResumesRequest $request, string $jd): JsonResponse

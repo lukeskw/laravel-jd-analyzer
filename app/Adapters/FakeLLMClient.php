@@ -34,6 +34,8 @@ class FakeLLMClient implements LLMClientInterface
             'weaknesses' => $weaknesses,
             'summary' => sprintf('Matched %d/%d JD keywords.', $matchCount, $den),
             'evidence' => array_slice($present, 0, 5),
+            'candidate_name' => $this->extractName($resumeText) ?? 'Unknown Candidate',
+            'candidate_email' => $this->extractEmail($resumeText) ?? 'unknown@example.test',
         ];
     }
 
@@ -47,5 +49,38 @@ class FakeLLMClient implements LLMClientInterface
         $parts = preg_split('/\s+/', $text) ?: [];
 
         return array_values(array_filter($parts));
+    }
+
+    private function extractEmail(string $text): ?string
+    {
+        if (preg_match('/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i', $text, $matches) !== 1) {
+            return null;
+        }
+
+        return strtolower($matches[0]);
+    }
+
+    private function extractName(string $text): ?string
+    {
+        $lines = preg_split("/(\r\n|\n|\r)/", (string) $text) ?: [];
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+
+            $lower = strtolower($line);
+            if (str_contains($lower, '@') || str_contains($lower, 'linkedin') || str_contains($lower, 'curriculum')) {
+                continue;
+            }
+
+            if (preg_match('/^[a-z\s\'.-]+$/i', $line) !== 1) {
+                continue;
+            }
+
+            return mb_substr($line, 0, 120);
+        }
+
+        return null;
     }
 }

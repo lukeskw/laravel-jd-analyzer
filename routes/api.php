@@ -26,6 +26,8 @@ Route::prefix('v1')
             Route::get('me', [AuthenticationController::class, 'me'])
                 ->name('me');
 
+            Route::get('/jds', [CandidateFitController::class, 'listJobDescriptions'])->name('jds.index');
+
             Route::post('/jds', [CandidateFitController::class, 'storeJobDescription'])->name('jds.store');
 
             Route::post('/jds/{jd}/resumes', [CandidateFitController::class, 'storeResumes'])->name('jds.resumes.store');
