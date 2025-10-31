@@ -6,7 +6,7 @@ if [ "$SUPERVISOR_PHP_USER" != "root" ] && [ "$SUPERVISOR_PHP_USER" != "sail" ];
 fi
 
 if [ -n "${PORT}" ]; then
-    export SUPERVISOR_PHP_COMMAND="/usr/bin/php -d variables_order=EGPCS /var/www/html/artisan serve --host=0.0.0.0 --port=${PORT}"
+    export SUPERVISOR_PHP_COMMAND="/usr/bin/php8.4 -d variables_order=EGPCS /var/www/html/artisan serve --host=0.0.0.0 --port=${PORT}"
 fi
 
 if [ ! -z "$WWWUSER" ]; then

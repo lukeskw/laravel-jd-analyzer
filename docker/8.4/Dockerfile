@@ -11,9 +11,9 @@ WORKDIR /var/www/html
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
-ENV SUPERVISOR_PHP_COMMAND="/usr/bin/php -d variables_order=EGPCS /var/www/html/artisan serve --host=0.0.0.0 --port=80"
+ENV SUPERVISOR_PHP_COMMAND="/usr/bin/php8.4 -d variables_order=EGPCS /var/www/html/artisan serve --host=0.0.0.0 --port=8000"
 ENV SUPERVISOR_PHP_USER="sail"
-ENV PLAYWRIGHT_BROWSERS_PATH=0 
+ENV PLAYWRIGHT_BROWSERS_PATH=0
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
@@ -35,7 +35,7 @@ RUN apt-get update && apt-get upgrade -y \
        php8.4-intl php8.4-readline \
        php8.4-ldap \
        php8.4-msgpack php8.4-igbinary php8.4-redis php8.4-swoole \
-       php8.4-memcached php8.4-pcov php8.4-imagick php8.4-xdebug \
+       php8.4-memcached php8.4-pcov php8.4-imagick \
     && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_VERSION.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
@@ -58,9 +58,7 @@ RUN apt-get update && apt-get upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.4
-
-RUN userdel -r ubuntu
+RUN userdel -r ubuntu || true
 RUN groupadd --force -g $WWWGROUP sail
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
 RUN git config --global --add safe.directory /var/www/html
@@ -76,6 +74,6 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 
 COPY . .
 
-EXPOSE 80/tcp
+EXPOSE 8000
 
 ENTRYPOINT ["start-container"]
