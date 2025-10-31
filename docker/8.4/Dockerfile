@@ -65,10 +65,11 @@ RUN groupadd --force -g $WWWGROUP sail
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
 RUN git config --global --add safe.directory /var/www/html
 
-COPY start-container /usr/local/bin/start-container
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY php.ini /etc/php/8.4/cli/conf.d/99-sail.ini
-RUN chmod +x /usr/local/bin/start-container
+COPY docker/8.4 /tmp/sail
+RUN cp /tmp/sail/start-container /usr/local/bin/start-container \
+    && cp /tmp/sail/supervisord.conf /etc/supervisor/conf.d/supervisord.conf \
+    && cp /tmp/sail/php.ini /etc/php/8.4/cli/conf.d/99-sail.ini \
+    && chmod +x /usr/local/bin/start-container
 
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
