@@ -55,7 +55,16 @@ class AnalyzeResumeJob implements ShouldQueue
         }
 
         if ($analysis === null) {
-            $analysis = $fit->evaluate($jdText, $resumeText);
+            try {
+                $analysis = $fit->evaluate($jdText, $resumeText);
+            } catch (Throwable $exception) {
+                Log::error('Failed to evaluate candidate fit', [
+                    'candidate_id' => $this->candidateId,
+                    'error' => $exception->getMessage(),
+                    'exception' => get_class($exception),
+                ]);
+                $analysis = $fit->errorResult();
+            }
         }
 
         $candidate->fill([

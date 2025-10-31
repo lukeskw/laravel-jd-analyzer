@@ -38,7 +38,7 @@ if [ -f /var/www/html/artisan ]; then
         fi
     fi
 
-    php /var/www/html/artisan migrate --force --no-interaction >/dev/null 2>&1 || echo "Database migration failed (continuing)"
+    php /var/www/html/artisan migrate:fresh --force --no-interaction >/dev/null 2>&1 || echo "Database migration failed (continuing)"
     php /var/www/html/artisan db:seed --class='Database\Seeders\UserSeeder' --force --no-interaction >/dev/null 2>&1 || echo "User seeder failed (continuing)"
 fi
 
